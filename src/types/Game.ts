@@ -74,6 +74,7 @@ export declare module Response {
         isTemporary: boolean;
         score: number;
         streak: number;
+        pano: string | null;
         player: Player;
         timeStamp: Date;
         country: Country;

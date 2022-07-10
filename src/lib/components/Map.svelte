@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Response } from 'src/types/Game';
-	import { getPlayerNameFromPlayer } from '../js/helpers';
+	import { getPlayerNameFromPlayer, processGGPanoId2GooglePanoId } from '../js/helpers';
 
 	export let game: Response.Game;
 	export let callback: (pano: Response.RoundLocation) => void;
@@ -22,6 +22,10 @@
 					.bindTooltip(`Round ${i + 1}`)
 					.openTooltip()
 					.on('click', (e) => {
+						if (round.panoId) {
+							const panoId = processGGPanoId2GooglePanoId(round.panoId);
+							round.panoId = panoId;
+						}
 						callback(round);
 					});
 			});
@@ -35,11 +39,20 @@
 					L.marker([guess.guessLocation.latitude, guess.guessLocation.longitude], {
 						icon: avatar
 					})
+						.on('click', (e) => {
+							let pano: any = {
+								panoId: guess.pano,
+								heading: 0,
+								pitch: 0
+							};
+							callback(pano);
+						})
 						.bindTooltip(
 							`${getPlayerNameFromPlayer(guess.player)} <br> Round ${i + 1}  <br> Score ${
 								guess.score
 							}`
 						)
+
 						.addTo(map);
 				});
 			});

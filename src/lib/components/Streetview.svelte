@@ -3,37 +3,18 @@
 
 	export let pano: Response.RoundLocation;
 
-	function processGGPanoId2GooglePanoId(pano: string): string {
-		console.log(pano);
-		const len = pano.length / 2;
-		let realPano = '';
-
-		for (let i = 0; i < len; i++) {
-			realPano += String.fromCharCode(parseInt(pano.substr(i * 2, 2), 16));
-		}
-		console.log(realPano);
-		return realPano;
-	}
-
 	const createUrl = (pano: Response.RoundLocation) => {
 		let url: string | undefined;
 		console.log(pano);
 
-		if (pano?.panoId && pano?.heading && pano?.zoom && pano?.pitch) {
+		if (pano?.panoId && typeof pano?.heading !== 'undefined') {
 			let zoom = 1;
 			pano.pitch *= -1; // For some reason used reversed
 
-			url = `https://maps.google.com/maps?layer=c&panoid=${processGGPanoId2GooglePanoId(
+			url = `https://maps.google.com/maps?layer=c&panoid=${
 				pano.panoId
-			)}&source=embed&output=svembed&ie=UTF8&cbp=,${pano.heading + 0.0001},,,
+			}&source=embed&output=svembed&ie=UTF8&cbp=,${pano.heading + 0.0001},,,
 			`;
-			console.log(url);
-			return url;
-		} else if (pano?.lat && pano?.lng) {
-			let coordstr =
-				pano.lat.toString().replace(',', '.') + ',' + pano.lng.toString().replace(',', '.');
-
-			url = `https://maps.google.com/maps?layer=c&source=embed&output=svembed&ie=UTF8&cbll=${coordstr}`;
 			console.log(url);
 			return url;
 		}
