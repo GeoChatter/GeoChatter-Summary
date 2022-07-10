@@ -9,7 +9,7 @@
 
 	let pano: Response.RoundLocation;
 
-	let gameRes: Promise<Response.Game>;
+	let gameRes: Promise<Response.Game> | undefined;
 	import { page } from '$app/stores';
 	if (browser) {
 		const id = $page.url.searchParams.get('id');

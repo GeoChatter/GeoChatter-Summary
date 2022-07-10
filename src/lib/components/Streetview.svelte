@@ -16,7 +16,7 @@
 	}
 
 	const createUrl = (pano: Response.RoundLocation) => {
-		let url: string;
+		let url: string | undefined;
 		console.log(pano);
 
 		if (pano?.panoId && pano?.heading && pano?.zoom && pano?.pitch) {

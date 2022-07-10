@@ -17,9 +17,9 @@
 		<tr>
 			<th />
 			<th>Name</th>
-			<th class="cursor-pointer" on:click={() => (currSort = sortDistance)}>Distance (in ?)</th>
-			<th class="cursor-pointer" on:click={() => (currSort = sortTime)}>Time</th>
+			<th class="cursor-pointer" on:click={() => (currSort = sortDistance)}>Distance</th>
 			<th class="cursor-pointer" on:click={() => (currSort = sortScore)}>Score</th>
+			<th class="cursor-pointer" on:click={() => (currSort = sortTime)}>Time</th>
 		</tr>
 	</thead>
 	{#each game.results.filter((row) => typeof row.player !== 'undefined').sort(currSort) as row, i}
@@ -49,9 +49,8 @@
 						</div>
 					</a>
 				</th>
-				<th>{row.distance}</th>
-				<th>{row.time}</th>
-				<th>{row.score}</th>
+				<th>{Math.round(row.distance)} km</th>
+				<th>{row.score} </th><th>{Math.round(row.time / 1000 / 60)} min</th>
 			</tr>
 		</tbody>
 	{/each}
