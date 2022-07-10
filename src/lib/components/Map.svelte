@@ -17,10 +17,10 @@
 			}).addTo(map);
 
 			game.source.rounds.forEach((round, i) => {
-				if (round.panoId) {
-					const panoId = processGGPanoId2GooglePanoId(round.panoId);
-					round.panoId = panoId;
-				}
+				// if (round.panoId) {
+				// 	const panoId = processGGPanoId2GooglePanoId(round.panoId);
+				// 	round.panoId = panoId;
+				// }
 				const marker = L.marker([round.lat, round.lng])
 					.addTo(map)
 					.bindTooltip(`Round ${i + 1}`)
