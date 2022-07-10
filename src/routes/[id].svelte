@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { browser } from '$app/env';
-
 	import * as signalR from '@microsoft/signalr';
+	import Streetview from '../lib/components/Streetview.svelte';
+	import Map from '../lib/components/Map.svelte';
+	import Scoreboard from '../lib/components/Scoreboard.svelte';
 
 	export let id: string;
-	import type { Response } from './Game';
+	import type { Response } from '../types/Game';
 
 	const connection = new signalR.HubConnectionBuilder()
 		.withUrl('https://dev.geochatter.tv/guess/geoChatterHub')
@@ -19,129 +20,33 @@
 	};
 	let gameRes = getGameSummary(id);
 
-	function getPlayerNameFromPlayer(player: Response.Player) {
-		return player.playerName.toLowerCase() === player.displayName.toLocaleLowerCase()
-			? player.playerName
-			: player?.displayName;
-	}
-
-	const initMap = (node: HTMLDivElement) => {
-		import('leaflet').then((L) => {
-			const map = L.map(node, {
-				center: [0, 0],
-				zoom: 2
-			});
-			L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-				attribution:
-					'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-			}).addTo(map);
-
-			gameRes.then((game) => {
-				game.rounds.forEach((round, i) => {
-					round.guesses.forEach((guess) => {
-						let avatar = L.icon({
-							iconUrl: guess.player.profilePictureUrl,
-							iconSize: [30, 30],
-							className: 'mask mask-squircle'
-						});
-						L.marker([guess.guessLocation.latitude, guess.guessLocation.longitude], {
-							icon: avatar
-						})
-							.bindTooltip(
-								`${getPlayerNameFromPlayer(guess.player)} <br> Round ${i + 1}  <br> Score ${
-									guess.score
-								}`
-							)
-							.addTo(map);
-					});
-
-					const marker = L.marker([round.correctLocation.latitude, round.correctLocation.longitude])
-						.addTo(map)
-						.bindTooltip(`Round ${i + 1}`)
-						.openTooltip()
-						.on('click', (e) => {
-							const url = `https://www.google.com/maps/@?api=1&map_action=pano&pano=${round.correctLocation.id}`;
-							window!.open(url, '_blank')!.focus();
-						});
-				});
-			});
-		});
-	};
-
-	const sortScore = (row1: Response.Result, row2: Response.Result) => row2.score - row1.score;
-	const sortTime = (row1: Response.Result, row2: Response.Result) => row1.time - row2.time;
-	const sortDistance = (row1: Response.Result, row2: Response.Result) =>
-		row1.distance - row2.distance;
-
-	let currSort = sortScore;
+	//
+	let pano: Response.RoundLocation;
 </script>
 
-<svelte:head>
-	<link
-		rel="stylesheet"
-		href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
-		integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
-		crossorigin=""
-	/>
-</svelte:head>
 <div class="">
 	<div class="navbar rounded bg-base-100 w-full">
 		<a href="https://geochatter.tv" class="btn btn-ghost normal-case text-xl">GeoChatter.tv</a>
 	</div>
 </div>
 
-<div class="flex flex-col  h-full space-y-2 pt-2">
-	<div class="relative w-full h-96 ">
-		<div class="absolute top-0 bottom-0 w-full" use:initMap />
+{#await gameRes then game}
+	<div class="flex flex-col  h-full space-y-2 pt-2">
+		<div class="relative w-full h-96 ">
+			<Map
+				callback={(p) => {
+					pano = p;
+					pano = pano;
+				}}
+				{game}
+			/>
+		</div>
+
+		<Streetview bind:pano />
+		<div>
+			<Scoreboard {game} />
+		</div>
 	</div>
-	<div>
-		<table class="table w-full h-full">
-			<thead>
-				<tr>
-					<th />
-					<th>Name</th>
-					<th class="cursor-pointer" on:click={() => (currSort = sortDistance)}>Distance (in ?)</th>
-					<th class="cursor-pointer" on:click={() => (currSort = sortTime)}>Time</th>
-					<th class="cursor-pointer" on:click={() => (currSort = sortScore)}>Score</th>
-				</tr>
-			</thead>
-			{#await gameRes then game}
-				{#each game.results
-					.filter((row) => typeof row.player !== 'undefined')
-					.sort(currSort) as row, i}
-					<tbody>
-						<tr>
-							<th>{i + 1}</th>
-							<th>
-								<a href={'https://twitch.tv/' + row.player.displayName} target="_blank">
-									<div class="flex items-center space-x-2">
-										{#if row.player}
-											<div class="mask mask-squircle w-12 h-12">
-												<!-- svelte-ignore a11y-img-redundant-alt -->
-												<img src={row.player?.profilePictureUrl} alt="profile picture" />
-											</div>
-											<div>
-												<div class="font-bold">
-													{getPlayerNameFromPlayer(row.player)}
-												</div>
-											</div>
-										{:else}
-											<div>
-												<div class="font-bold">
-													{game.players.find((player) => player.id === row.id)}
-												</div>
-											</div>
-										{/if}
-									</div>
-								</a>
-							</th>
-							<th>{row.distance}</th>
-							<th>{row.time}</th>
-							<th>{row.score}</th>
-						</tr>
-					</tbody>
-				{/each}
-			{/await}
-		</table>
-	</div>
-</div>
+{/await}
+
+<div test={"noah"}/>
