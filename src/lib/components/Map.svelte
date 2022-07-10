@@ -3,7 +3,7 @@
 	import { getPlayerNameFromPlayer, processGGPanoId2GooglePanoId } from '../js/helpers';
 
 	export let game: Response.Game;
-	export let callback: (pano: Response.RoundLocation) => void;
+	export let callback: (pano: Response.RoundLocation & { text?: string }) => void;
 
 	const initMap = (node: HTMLDivElement) => {
 		import('leaflet').then((L) => {
@@ -26,6 +26,7 @@
 					.bindTooltip(`Round ${i + 1}`)
 					.openTooltip()
 					.on('click', (e) => {
+						round.text = `Correct location in round ${i + 1}`;
 						callback(round);
 					});
 			});
@@ -39,11 +40,15 @@
 					L.marker([guess.guessLocation.latitude, guess.guessLocation.longitude], {
 						icon: avatar
 					})
-						.on('click', (e) => {
-							let pano: any = {
+						.on('click', () => {
+							let pano = {
 								panoId: guess.pano,
 								heading: 0,
-								pitch: 0
+								pitch: 0,
+								lat: guess.guessLocation.latitude,
+								lng: guess.guessLocation.longitude,
+								// place in results not implmented yet
+								text: `${getPlayerNameFromPlayer(guess.player)}'s guess in round ${i + 1}`
 							};
 							callback(pano);
 						})

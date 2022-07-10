@@ -107,15 +107,15 @@ export declare module Response {
     }
 
 
-    export interface RoundLocation {
-        id: number;
-        lat: number;
-        lng: number;
-        panoId: string | undefined;
-        heading: number;
-        pitch: number;
-        zoom: number;
-        streakLocationCode: string;
+    export type RoundLocation = {
+        id?: number;
+        lat?: number;
+        lng?: number;
+        panoId?: string | undefined;
+        heading?: number;
+        pitch?: number;
+        zoom?: number;
+        streakLocationCode?: string;
     }
 
     export interface Source {

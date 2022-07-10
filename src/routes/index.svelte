@@ -41,18 +41,30 @@
 	{#if gameRes}
 		{#await gameRes then game}
 			<div class="flex flex-col  h-full space-y-2 xl:space-y-12 pt-2 xl:pt-12 ">
-				<div class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 xl:space-x-12">
-					<div class="relative w-full h-96 ">
-						<Map
-							callback={(p) => {
-								pano = p;
-								pano = pano;
-							}}
-							{game}
-						/>
+				<div
+					class="flex items-end justify-center flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 xl:space-x-12"
+				>
+					<div class="w-full h-full text-white">
+						{`Summary of ${game.source.mapName} hosted by ${game.channel}`}
+						<!-- for round amount -->
+						<!--  of ${game.rounds.length} rounds -->
+						<div class="relative w-full h-96 text-white">
+							<Map
+								callback={(p) => {
+									pano = p;
+									pano = pano;
+								}}
+								{game}
+							/>
+						</div>
 					</div>
 
-					<Streetview bind:pano />
+					{#if pano?.text}
+						<div class="text-white w-full h-full">
+							{pano?.text}
+							<Streetview bind:pano />
+						</div>
+					{/if}
 				</div>
 				<div>
 					<Scoreboard {game} />
