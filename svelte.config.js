@@ -14,11 +14,19 @@ const config = {
 	],
 
 	kit: {
+		prerender: { enabled: true, default: true },
 		paths: {
 			base: '/results'
 
 		},
-		adapter: adapter(
+		adapter: adapter({
+			// default options are shown
+			pages: 'build',
+			assets: 'build',
+			fallback: null,
+			precompress: false
+
+		}
 		)
 	}
 };
