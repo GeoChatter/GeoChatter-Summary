@@ -13,7 +13,7 @@
 
 			url = `https://maps.google.com/maps?layer=c&panoid=${
 				pano.panoId
-			}&source=embed&output=svembed&ie=UTF8&cbp=,${pano.heading + 0.0001},,,
+			}&source=embed&output=svembed&ie=UTF8&cbp=,${pano.heading ? pano.heading : ''},,,
 			`;
 			console.log(url);
 			return url;
