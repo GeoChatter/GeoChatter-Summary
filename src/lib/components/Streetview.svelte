@@ -27,5 +27,5 @@
 </script>
 
 {#if typeof url !== 'undefined'}
-	<iframe class="w-full h-96 " src={url} />
+	<iframe class="w-full h-96  rounded-md" src={url} />
 {/if}

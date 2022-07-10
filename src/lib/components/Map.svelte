@@ -69,4 +69,4 @@
 	/>
 </svelte:head>
 
-<div class="absolute top-0 bottom-0 w-full" use:initMap />
+<div class="absolute top-0 bottom-0 w-full rounded-md" use:initMap />
