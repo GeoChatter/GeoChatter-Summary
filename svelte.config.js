@@ -14,7 +14,7 @@ const config = {
 	],
 
 	kit: {
-		prerender: { enabled: false, default: true },
+		prerender: { enabled: true, default: true },
 		paths: {
 			base: '/results'
 
