@@ -50,7 +50,9 @@
 					</a>
 				</th>
 				<th>{Math.round(row.distance)} km</th>
-				<th>{row.score} </th><th>{Math.round(row.time / 1000 / 60)} min</th>
+				<th>{row.score} </th><th
+					>{Math.round(row.time / 1000 / 60)} min {Math.round((row.time / 1000) % 60)} s</th
+				>
 			</tr>
 		</tbody>
 	{/each}

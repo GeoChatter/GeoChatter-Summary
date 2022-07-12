@@ -114,6 +114,7 @@ export declare module Response {
         panoId?: string | undefined;
         heading?: number;
         pitch?: number;
+        text?: string;
         zoom?: number;
         streakLocationCode?: string;
     }
