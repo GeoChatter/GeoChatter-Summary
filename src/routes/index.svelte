@@ -69,7 +69,7 @@
 					{/if}
 				</div>
 				<div>
-					<Scoreboard {game} />
+					<Scoreboard game={game} />
 				</div>
 			</div>
 		{/await}

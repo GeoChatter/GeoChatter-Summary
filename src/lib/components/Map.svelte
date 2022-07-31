@@ -16,51 +16,68 @@
 					'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 			}).addTo(map);
 
-			game.source.rounds.forEach((round, i) => {
-				// if (round.panoId) {
-				// 	const panoId = processGGPanoId2GooglePanoId(round.panoId);
-				// 	round.panoId = panoId;
-				// }
-				const marker = L.marker([round.lat, round.lng])
-					.addTo(map)
-					.bindTooltip(`Round ${i + 1}`)
-					.openTooltip()
-					.on('click', (e) => {
-						round.text = `Correct location in round ${i + 1}`;
-						callback(round);
-					});
-			});
-			game.rounds.forEach((round, i) => {
-				round.guesses.forEach((guess) => {
-					let avatar = L.icon({
-						iconUrl: guess.player.profilePictureUrl,
-						iconSize: [30, 30],
-						className: 'mask mask-squircle'
-					});
-					L.marker([guess.guessLocation.latitude, guess.guessLocation.longitude], {
-						icon: avatar
-					})
-						.on('click', () => {
-							let pano = {
-								panoId: guess.pano,
-								heading: 0,
-								pitch: 0,
-								lat: guess.guessLocation.latitude,
-								lng: guess.guessLocation.longitude,
-								// place in results not implmented yet
-								text: `${getPlayerNameFromPlayer(guess.player)}'s guess in round ${i + 1}`
-							};
-							callback(pano);
-						})
-						.bindTooltip(
-							`${getPlayerNameFromPlayer(guess.player)} <br> Round ${i + 1}  <br> Score ${
-								guess.score
-							}`
-						)
-
-						.addTo(map);
+			const renderGame = (game: Response.Game, roundsBefore = 1) => {
+				game.source.rounds.forEach((round, i) => {
+					i = i + roundsBefore -1;
+					// if (round.panoId) {
+					// 	const panoId = processGGPanoId2GooglePanoId(round.panoId);
+					// 	round.panoId = panoId;
+					// }
+					if (typeof round.lat !== 'number' || typeof round.lng !== 'number') return;
+					const marker = L.marker([round.lat, round.lng])
+						.addTo(map)
+						.bindTooltip(`Round ${i + 1}`)
+						.openTooltip()
+						.on('click', (e) => {
+							round.text = `Correct location in round ${i + 1}`;
+							callback(round);
+						});
 				});
-			});
+				game.rounds.forEach((round, i) => {
+					round.guesses.forEach((guess) => {
+						let avatar = L.icon({
+							iconUrl: guess.player.profilePictureUrl,
+							iconSize: [30, 30],
+							className: 'mask mask-squircle'
+						});
+						L.marker([guess.guessLocation.latitude, guess.guessLocation.longitude], {
+							icon: avatar
+						})
+							.on('click', () => {
+								let pano = {
+									panoId: guess.pano,
+									heading: 0,
+									pitch: 0,
+									lat: guess.guessLocation.latitude,
+									lng: guess.guessLocation.longitude,
+									// place in results not implmented yet
+									text: `${getPlayerNameFromPlayer(guess.player)}'s guess in round ${i + 1}`
+								};
+								callback(pano);
+							})
+							.bindTooltip(
+								`${getPlayerNameFromPlayer(guess.player)} <br> Round ${i + 1}  <br> Score ${
+									guess.score
+								}`
+							)
+
+							.addTo(map);
+					});
+				});
+			};
+
+			// normal game
+			if (!game.next) {
+				renderGame(game);
+			} else {
+				let currentGame = game;
+				let counter = 1
+				while (currentGame) {
+					renderGame(currentGame, counter);
+					counter = counter + 5
+					currentGame = currentGame.next;
+				}
+			}
 		});
 	};
 </script>

@@ -10,6 +10,15 @@
 		row1.distance - row2.distance;
 
 	let currSort = sortScore;
+
+const getLastGame = (game: Response.Game) => {
+						let lastGame = game;
+						 while (lastGame.next) {
+						 	lastGame = lastGame.next
+						 };
+						return lastGame
+					}
+					game = getLastGame(game)
 </script>
 
 <table class="table w-full h-full">
@@ -27,7 +36,7 @@
 			<tr>
 				<th>{i + 1}</th>
 				<th>
-					<a href={'https://twitch.tv/' + row.player.displayName} target="_blank">
+					<a href={'https://twitch.tv/' + row.player?.displayName?? row.player?.playerName} target="_blank">
 						<div class="flex items-center space-x-2">
 							{#if row.player}
 								<div class="mask mask-squircle w-12 h-12">

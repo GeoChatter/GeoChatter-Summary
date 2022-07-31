@@ -1,5 +1,6 @@
 import type { Response } from '../../types/Game';
-export default async (): Promise<Response.Game> => {return {
+export default async (): Promise<Response.Game> => {
+let fakeValue = {
     "next": {
         "next": {
             "next": null,
@@ -13818,4 +13819,6 @@ export default async (): Promise<Response.Game> => {return {
             "isVerified": false
         }
     }
-}}
+}
+    console.log(fakeValue)
+    return fakeValue }
