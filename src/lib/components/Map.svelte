@@ -18,7 +18,7 @@
 
 			const renderGame = (game: Response.Game, roundsBefore = 1) => {
 				game.source.rounds.forEach((round, i) => {
-					i = i + roundsBefore -1;
+					i = i + roundsBefore - 1;
 					// if (round.panoId) {
 					// 	const panoId = processGGPanoId2GooglePanoId(round.panoId);
 					// 	round.panoId = panoId;
@@ -34,6 +34,7 @@
 						});
 				});
 				game.rounds.forEach((round, i) => {
+					i = i + roundsBefore - 1;
 					round.guesses.forEach((guess) => {
 						let avatar = L.icon({
 							iconUrl: guess.player.profilePictureUrl,
@@ -71,10 +72,10 @@
 				renderGame(game);
 			} else {
 				let currentGame = game;
-				let counter = 1
+				let counter = 1;
 				while (currentGame) {
 					renderGame(currentGame, counter);
-					counter = counter + 5
+					counter = counter + 5;
 					currentGame = currentGame.next;
 				}
 			}
