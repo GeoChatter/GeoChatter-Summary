@@ -11,6 +11,7 @@
 
 	let gameRes: Promise<Response.Game> | undefined;
 	import { page } from '$app/stores';
+	import fakeInfiniteGame from '$lib/js/fakeInfiniteGame';
 	if (browser) {
 		const id = $page.url.searchParams.get('id');
 		const connection = new signalR.HubConnectionBuilder()
@@ -25,7 +26,8 @@
 			return res;
 		};
 		if (id) {
-			gameRes = getGameSummary(id);
+			// gameRes = getGameSummary(id);
+			gameRes = fakeInfiniteGame();
 		}
 	}
 

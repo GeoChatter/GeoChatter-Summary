@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Response } from 'src/types/Game';
-	import { getPlayerNameFromPlayer, processGGPanoId2GooglePanoId } from '../js/helpers';
+	import { getPlayerNameFromPlayer } from '../js/helpers';
 
 	export let game: Response.Game;
 	export let callback: (pano: Response.RoundLocation & { text?: string }) => void;

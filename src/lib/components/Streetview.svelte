@@ -27,5 +27,9 @@
 </script>
 
 {#if typeof url !== 'undefined'}
-	<iframe class="w-full h-96  rounded-md" src={url} />
+	<iframe class="w-full h-96  rounded-md" src={url} ></iframe>
+{:else}
+<div class="w-full text-white h-96  rounded-md text-center flex justify-center items-center">
+	no street view :(
+</div>
 {/if}
