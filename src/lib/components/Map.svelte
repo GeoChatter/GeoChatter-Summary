@@ -24,7 +24,13 @@
 					// 	round.panoId = panoId;
 					// }
 					if (typeof round.lat !== 'number' || typeof round.lng !== 'number') return;
-					const marker = L.marker([round.lat, round.lng])
+
+						let icon = L.icon({
+							iconUrl: "/results/marker.svg",
+							iconSize: [30, 30],
+							// className: 'mask mask-squircle'
+						});
+					const marker = L.marker([round.lat, round.lng], {icon})
 						.addTo(map)
 						.bindTooltip(`Round ${i + 1}`)
 						.openTooltip()
