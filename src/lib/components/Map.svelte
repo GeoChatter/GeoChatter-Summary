@@ -48,7 +48,6 @@
 
 							.addTo(map);
 					});
-
 				});
 
 				game.source.rounds.forEach((round, i) => {
@@ -59,15 +58,20 @@
 					// }
 					if (typeof round.lat !== 'number' || typeof round.lng !== 'number') return;
 
-						let icon = L.icon({
-							iconUrl: "/results/marker.svg",
-							iconSize: [30, 30],
-							className: 'z-50'
-						});
-					const marker = L.marker([round.lat, round.lng], {icon})
+					let icon = L.icon({
+						iconUrl: '/results/marker.svg',
+						iconSize: [30, 30],
+						iconAnchor: [15,30],
+						className: 'z-50'
+					});
+					const marker = L.marker([round.lat, round.lng], { icon })
 						.addTo(map)
-						.bindTooltip(`Round ${i + 1}`)
-						.openTooltip()
+						.bindTooltip(`Round ${i + 1}`, {
+							permanent: true,
+							direction: 'top',
+							offset: [0,-25],
+						})
+						// .openTooltip()
 						.on('click', (e) => {
 							round.text = `Correct location in round ${i + 1}`;
 							callback(round);
