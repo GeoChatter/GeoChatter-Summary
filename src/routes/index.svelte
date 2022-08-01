@@ -11,6 +11,7 @@
 
 	let gameRes: Promise<Response.Game> | undefined;
 	import { page } from '$app/stores';
+import fakeInfiniteGame from '$lib/js/fakeInfiniteGame';
 	// import fakeInfiniteGame from '$lib/js/fakeInfiniteGame';
 	if (browser) {
 		const id = $page.url.searchParams.get('id');
@@ -41,7 +42,9 @@
 		</div>
 	</div>
 	{#if gameRes}
-		{#await gameRes then game}
+		{#await gameRes}
+		<div class="btn mt-2 loading w-full h-screen flex justify-center items-center text-center text-white ">loading</div>>
+		{:then game}
 			<div class="flex flex-col  h-full space-y-2 xl:space-y-12 pt-2 xl:pt-12 ">
 				<div
 					class="flex items-end justify-center flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 xl:space-x-12"
@@ -72,6 +75,10 @@
 					<Scoreboard game={game} />
 				</div>
 			</div>
+		{:catch error}
+		<div class="w-full h-screen text-center flex items-center justify-center">
+			<p style="color: red">{error.message}</p>
+	</div>
 		{/await}
 	{/if}
 </div>

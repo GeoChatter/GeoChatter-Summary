@@ -27,9 +27,14 @@
 </script>
 
 {#if typeof url !== 'undefined'}
-	<iframe class="w-full h-96  rounded-md" src={url} ></iframe>
+	<iframe class="w-full h-96  rounded-md" src={url} />
 {:else}
-<div class="w-full text-white h-96  rounded-md text-center flex justify-center items-center">
-	no street view :(
-</div>
+	<div
+		class="w-full text-white h-96  rounded-md text-center flex flex-col space-y-4 justify-center items-center"
+	>
+		<div>no street view :(</div>
+		<a target="_blank" href={`https://www.google.com/maps/@${pano.lat},${pano.lng},8z`}
+			><button class="btn">open location in google maps</button></a
+		>
+	</div>
 {/if}
