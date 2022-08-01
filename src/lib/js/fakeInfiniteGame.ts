@@ -1,5 +1,9 @@
 import type { Response } from '../../types/Game';
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 export default async (): Promise<Response.Game> => {
+    await sleep(5000)
 let fakeValue = {
     "next": {
         "next": {
