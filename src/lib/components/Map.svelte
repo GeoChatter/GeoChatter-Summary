@@ -17,28 +17,6 @@
 			}).addTo(map);
 
 			const renderGame = (game: Response.Game, roundsBefore = 1) => {
-				game.source.rounds.forEach((round, i) => {
-					i = i + roundsBefore - 1;
-					// if (round.panoId) {
-					// 	const panoId = processGGPanoId2GooglePanoId(round.panoId);
-					// 	round.panoId = panoId;
-					// }
-					if (typeof round.lat !== 'number' || typeof round.lng !== 'number') return;
-
-						let icon = L.icon({
-							iconUrl: "/results/marker.svg",
-							iconSize: [30, 30],
-							// className: 'mask mask-squircle'
-						});
-					const marker = L.marker([round.lat, round.lng], {icon})
-						.addTo(map)
-						.bindTooltip(`Round ${i + 1}`)
-						.openTooltip()
-						.on('click', (e) => {
-							round.text = `Correct location in round ${i + 1}`;
-							callback(round);
-						});
-				});
 				game.rounds.forEach((round, i) => {
 					i = i + roundsBefore - 1;
 					round.guesses.forEach((guess) => {
@@ -70,6 +48,30 @@
 
 							.addTo(map);
 					});
+
+				});
+
+				game.source.rounds.forEach((round, i) => {
+					i = i + roundsBefore - 1;
+					// if (round.panoId) {
+					// 	const panoId = processGGPanoId2GooglePanoId(round.panoId);
+					// 	round.panoId = panoId;
+					// }
+					if (typeof round.lat !== 'number' || typeof round.lng !== 'number') return;
+
+						let icon = L.icon({
+							iconUrl: "/results/marker.svg",
+							iconSize: [30, 30],
+							className: 'z-50'
+						});
+					const marker = L.marker([round.lat, round.lng], {icon})
+						.addTo(map)
+						.bindTooltip(`Round ${i + 1}`)
+						.openTooltip()
+						.on('click', (e) => {
+							round.text = `Correct location in round ${i + 1}`;
+							callback(round);
+						});
 				});
 			};
 
