@@ -1,8 +1,13 @@
 import type { Response } from "src/types/Game";
 export function getPlayerNameFromPlayer(player: Response.Player) {
-    return player.playerName.toLowerCase() === player.displayName.toLocaleLowerCase()
+    try {
+    return player?.playerName?.toLowerCase() === player?.displayName?.toLocaleLowerCase()
         ? player.playerName
-        : player?.displayName;
+        : player.displayName;
+    }
+    catch (e) {
+        return "player not found"
+    }
 }
 // export function processGGPanoId2GooglePanoId(pano: string): string {
 // 		console.log(pano);
