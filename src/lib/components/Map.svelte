@@ -1,5 +1,6 @@
 <script lang="ts">
-import type { Map, Marker } from 'leaflet';
+
+import type { Polyline,  Map,  Marker } from 'leaflet';
 
 	import type { Response } from 'src/types/Game';
 	import { getPlayerNameFromPlayer } from '../js/helpers';
@@ -8,9 +9,9 @@ import type { Map, Marker } from 'leaflet';
 	export let callback: (pano: Response.RoundLocation & { text?: string }) => void;
 
 let map: Map
-	let markers: {[key: number]: Marker<any>[]} = {}
+	let markers: {[key: number]: (Marker<any> | Polyline)[]} = {}
 	let currentSelectedIndex: undefined | number = undefined
-	const initMap = (node: HTMLDivElement) => {
+	const initMap =  (node: HTMLDivElement) => {
 		import('leaflet').then((L) => {
 			map = L.map(node, {
 				center: [0, 0],
@@ -31,10 +32,19 @@ let map: Map
 						markers[i] = []
 					}
 					round.guesses.forEach((guess) => {
+						// polyline 
+						markers[i].push(L.polyline([
+									 [guess?.guessLocation.latitude,
+									 guess.guessLocation.longitude],
+									 [round.correctLocation.latitude,round.correctLocation.longitude]
+						], {color: guess?.player?.color?? "blue", smoothFactor: 1, opacity: 0.5}).addTo(map))
+
+
 						let avatar = L.icon({
+							// FIXME: Add url for not found
 							iconUrl: guess?.player?.profilePictureUrl ?? "no pfp",
 							iconSize: [30, 30],
-							className: 'mask mask-squircle'
+							className: `rounded-full border-4  ${guess?.player?.color ? `border-[${guess?.player?.color}]` : "border-blue-500"}`
 						});
 						markers[i].push(L.marker([guess.guessLocation.latitude, guess.guessLocation.longitude], {
 							icon: avatar
@@ -47,13 +57,13 @@ let map: Map
 									lat: guess.guessLocation.latitude,
 									lng: guess.guessLocation.longitude,
 									// place in results not implmented yet
-									text: `${getPlayerNameFromPlayer(guess.player)}'s guess in round ${i + 1}`
+									text: `${getPlayerNameFromPlayer(guess?.player)}'s guess in round ${i + 1}`
 								};
 								callback(pano);
 							})
 							.bindTooltip(
-								`${getPlayerNameFromPlayer(guess.player)} <br> Round ${i + 1}  <br> Score ${
-									guess.score
+								`${getPlayerNameFromPlayer(guess?.player)} <br> Round ${i + 1}  <br> Score ${
+									guess?.score
 								}`
 							).addTo(map)
 							)
@@ -67,7 +77,6 @@ let map: Map
 					// 	round.panoId = panoId;
 					// }
 					if (typeof round.lat !== 'number' || typeof round.lng !== 'number') {
-						console.warn({round})
 						return;
 
 					}
@@ -76,7 +85,7 @@ let map: Map
 						iconUrl: '/results/marker.svg',
 						iconSize: [30, 30],
 						iconAnchor: [15,30],
-						className: 'z-50'
+						className: ''
 					});
 					const marker = L.marker([round.lat, round.lng], { icon })
 						.addTo(map)
@@ -100,7 +109,6 @@ let map: Map
 				});
 			};
 
-			// normal game
 			if (!game.next) {
 				renderGame(game);
 			} else {
@@ -109,10 +117,10 @@ let map: Map
 				while (currentGame) {
 					renderGame(currentGame, counter);
 					counter = counter + 5;
-					currentGame = currentGame.next;
+					currentGame = currentGame?.next;
 				}
 			}
-		});
+		}).catch(e => console.log(e));
 	};
 </script>
 
@@ -126,14 +134,15 @@ let map: Map
 </svelte:head>
 <div class="flex items-center justify-center w-full absolute bottom-2 btn-group z-[5000]">
 
-	{#each Object.keys(markers) as key }
+{#each Object.keys(markers) as key }
 		
   	<button on:click={()=> {
 							markers[key].forEach((marker) => marker.addTo(map))
 							currentSelectedIndex = Number(key)
 							Object.keys(markers).forEach(k =>{
 								if (Number(k) !== Number(key) ){
-									markers[k].forEach(marker => marker.remove(map))
+									markers[k].forEach(marker => {
+									marker.remove(map)})
 								}}
 							)}
   	} class={`btn btn-xs ${Number(key) === currentSelectedIndex ? "btn-active": ""}`}>{Number(key)+1}</button>
