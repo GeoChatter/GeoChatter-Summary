@@ -1,13 +1,19 @@
 <script lang="ts">
+
+import type { Polyline,  Map,  Marker } from 'leaflet';
+
 	import type { Response } from 'src/types/Game';
 	import { getPlayerNameFromPlayer } from '../js/helpers';
 
 	export let game: Response.Game;
 	export let callback: (pano: Response.RoundLocation & { text?: string }) => void;
 
-	const initMap = (node: HTMLDivElement) => {
+let map: Map
+	let markers: {[key: number]: (Marker<any> | Polyline)[]} = {}
+	let currentSelectedIndex: undefined | number = undefined
+	const initMap =  (node: HTMLDivElement) => {
 		import('leaflet').then((L) => {
-			const map = L.map(node, {
+			map = L.map(node, {
 				center: [0, 0],
 				zoom: 2
 			});
@@ -16,16 +22,31 @@
 					'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 			}).addTo(map);
 
+
 			const renderGame = (game: Response.Game, roundsBefore = 1) => {
+
 				game.rounds.forEach((round, i) => {
 					i = i + roundsBefore - 1;
+
+					if (typeof markers[i] === "undefined"){
+						markers[i] = []
+					}
 					round.guesses.forEach((guess) => {
+						// polyline 
+						markers[i].push(L.polyline([
+									 [guess?.guessLocation.latitude,
+									 guess.guessLocation.longitude],
+									 [round.correctLocation.latitude,round.correctLocation.longitude]
+						], {color: guess?.player?.color?? "blue", smoothFactor: 1, opacity: 0.5}).addTo(map))
+
+
 						let avatar = L.icon({
-							iconUrl: guess.player.profilePictureUrl,
+							// FIXME: Add url for not found
+							iconUrl: guess?.player?.profilePictureUrl ?? "no pfp",
 							iconSize: [30, 30],
-							className: 'mask mask-squircle'
+							className: `rounded-full border-4  ${guess?.player?.color ? `border-[${guess?.player?.color}]` : "border-blue-500"}`
 						});
-						L.marker([guess.guessLocation.latitude, guess.guessLocation.longitude], {
+						markers[i].push(L.marker([guess.guessLocation.latitude, guess.guessLocation.longitude], {
 							icon: avatar
 						})
 							.on('click', () => {
@@ -36,17 +57,16 @@
 									lat: guess.guessLocation.latitude,
 									lng: guess.guessLocation.longitude,
 									// place in results not implmented yet
-									text: `${getPlayerNameFromPlayer(guess.player)}'s guess in round ${i + 1}`
+									text: `${getPlayerNameFromPlayer(guess?.player)}'s guess in round ${i + 1}`
 								};
 								callback(pano);
 							})
 							.bindTooltip(
-								`${getPlayerNameFromPlayer(guess.player)} <br> Round ${i + 1}  <br> Score ${
-									guess.score
+								`${getPlayerNameFromPlayer(guess?.player)} <br> Round ${i + 1}  <br> Score ${
+									guess?.score
 								}`
+							).addTo(map)
 							)
-
-							.addTo(map);
 					});
 				});
 
@@ -56,17 +76,20 @@
 					// 	const panoId = processGGPanoId2GooglePanoId(round.panoId);
 					// 	round.panoId = panoId;
 					// }
-					if (typeof round.lat !== 'number' || typeof round.lng !== 'number') return;
+					if (typeof round.lat !== 'number' || typeof round.lng !== 'number') {
+						return;
+
+					}
 
 					let icon = L.icon({
 						iconUrl: '/results/marker.svg',
 						iconSize: [30, 30],
 						iconAnchor: [15,30],
-						className: 'z-50'
+						className: ''
 					});
 					const marker = L.marker([round.lat, round.lng], { icon })
 						.addTo(map)
-						.bindTooltip(`Round ${i + 1}`, {
+						.bindTooltip(`${i + 1}`, {
 							permanent: true,
 							direction: 'top',
 							offset: [0,-25],
@@ -74,12 +97,18 @@
 						// .openTooltip()
 						.on('click', (e) => {
 							round.text = `Correct location in round ${i + 1}`;
+							markers[i].forEach(marker => marker.addTo(map))
+							currentSelectedIndex = i
+							Object.keys(markers).forEach( (key:any) =>{
+								if (Number(key) !== i ){
+									markers[key].forEach((marker:any) => marker.remove(map))
+								}}
+							)
 							callback(round);
 						});
 				});
 			};
 
-			// normal game
 			if (!game.next) {
 				renderGame(game);
 			} else {
@@ -88,10 +117,10 @@
 				while (currentGame) {
 					renderGame(currentGame, counter);
 					counter = counter + 5;
-					currentGame = currentGame.next;
+					currentGame = currentGame?.next;
 				}
 			}
-		});
+		}).catch(e => console.log(e));
 	};
 </script>
 
@@ -103,5 +132,21 @@
 		crossorigin=""
 	/>
 </svelte:head>
+<div class="flex items-center justify-center w-full absolute bottom-2 btn-group z-[5000]">
+
+{#each Object.keys(markers) as key }
+		
+  	<button on:click={()=> {
+							markers[key].forEach((marker) => marker.addTo(map))
+							currentSelectedIndex = Number(key)
+							Object.keys(markers).forEach(k =>{
+								if (Number(k) !== Number(key) ){
+									markers[k].forEach(marker => {
+									marker.remove(map)})
+								}}
+							)}
+  	} class={`btn btn-xs ${Number(key) === currentSelectedIndex ? "btn-active": ""}`}>{Number(key)+1}</button>
+  {/each}
+</div>
 
 <div class="absolute top-0 bottom-0 w-full rounded-md" use:initMap />

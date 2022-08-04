@@ -5,13 +5,13 @@
 	import Scoreboard from '../lib/components/Scoreboard.svelte';
 
 	import type { Response } from '../types/Game';
-	import { browser } from '$app/env';
+	import { browser, dev } from '$app/env';
 
 	let pano: Response.RoundLocation;
 
 	let gameRes: Promise<Response.Game> | undefined;
 	import { page } from '$app/stores';
-import fakeInfiniteGame from '$lib/js/fakeInfiniteGame';
+	import fakeInfiniteGame from '$lib/js/fakeInfiniteGame';
 	// import fakeInfiniteGame from '$lib/js/fakeInfiniteGame';
 	if (browser) {
 		const id = $page.url.searchParams.get('id');
@@ -27,8 +27,11 @@ import fakeInfiniteGame from '$lib/js/fakeInfiniteGame';
 			return res;
 		};
 		if (id) {
-			gameRes = getGameSummary(id);
-			// gameRes = fakeInfiniteGame();
+			if (dev) {
+				gameRes = fakeInfiniteGame();
+			} else {
+				gameRes = getGameSummary(id);
+			}
 		}
 	}
 
@@ -43,7 +46,12 @@ import fakeInfiniteGame from '$lib/js/fakeInfiniteGame';
 	</div>
 	{#if gameRes}
 		{#await gameRes}
-		<div class="btn mt-2 loading w-full h-screen flex justify-center items-center text-center text-white ">loading</div>>
+			<div
+				class="btn mt-2 loading w-full h-screen flex justify-center items-center text-center text-white "
+			>
+				loading
+			</div>
+			>
 		{:then game}
 			<div class="flex flex-col  h-full space-y-2 xl:space-y-12 pt-2 xl:pt-12 ">
 				<div
@@ -72,13 +80,13 @@ import fakeInfiniteGame from '$lib/js/fakeInfiniteGame';
 					{/if}
 				</div>
 				<div>
-					<Scoreboard game={game} />
+					<Scoreboard {game} />
 				</div>
 			</div>
 		{:catch error}
-		<div class="w-full h-screen text-center flex items-center justify-center">
-			<p style="color: red">{error.message}</p>
-	</div>
+			<div class="w-full h-screen text-center flex items-center justify-center">
+				<p style="color: red">{error.message}</p>
+			</div>
 		{/await}
 	{/if}
 </div>
