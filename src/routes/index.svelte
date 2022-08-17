@@ -41,7 +41,7 @@
 <div class="xl:p-12">
 	<div class="">
 		<div class="navbar rounded bg-base-100 w-full">
-			<a href="https://geochatter.tv" class="btn btn-ghost normal-case text-xl">GeoChatter.tv</a>
+		<img class="h-8" src="https://geochatter.tv/icon_smaller.ico"/><a href="https://geochatter.tv" class="btn btn-ghost normal-case text-xl">GeoChatter.tv</a>
 		</div>
 	</div>
 	{#if gameRes}
@@ -58,7 +58,7 @@
 					class="flex items-end justify-center flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 xl:space-x-12"
 				>
 					<div class="w-full h-full text-white">
-						{`Summary of ${game.source.mapName} hosted by ${game.channel}`}
+						Summary of <span class="font-extrabold">{game.source.mapName}</span> hosted by <span class="font-extrabold">{game.channel}</span>
 						<!-- for round amount -->
 						<!--  of ${game.rounds.length} rounds -->
 						<div class="relative w-full h-96 text-white">
