@@ -4,7 +4,7 @@ on:
 
 env:
   BASE_PATH: /results
-  VITE_GEOCHATTERURL: https://dev.geochatter.tv/guess/geoChatterHub
+  VITE_GEOCHATTERURL: https://api.geochatter.tv/guess/geoChatterHub
 name: 🚀 Deploy website on push
 
 jobs:
