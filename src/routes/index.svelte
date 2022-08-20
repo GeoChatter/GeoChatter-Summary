@@ -16,7 +16,7 @@
 	if (browser) {
 		const id = $page.url.searchParams.get('id');
 		const connection = new signalR.HubConnectionBuilder()
-			.withUrl('https://api.geochatter.tv/guess/geoChatterHub')
+			.withUrl(import.meta.env.VITE_GEOCHATTERURL as string)
 			.build();
 		const startRes = connection.start();
 		const getGameSummary = async (gameId: string) => {

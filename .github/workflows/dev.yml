@@ -1,10 +1,12 @@
+
 on:
   push:
-    branches: [master]
+    branches: [dev]
 
 env:
-  BASE_PATH: /results
+  BASE_PATH: /testing_results
   VITE_GEOCHATTERURL: https://dev.geochatter.tv/guess/geoChatterHub
+
 name: 🚀 Deploy website on push
 
 jobs:
@@ -25,11 +27,11 @@ jobs:
           npm ci
           npm run build
 
-      - name: 📂 upload to /results
+      - name: 📂 upload to /testing_results
         uses: SamKirkland/FTP-Deploy-Action@4.3.0
         with:
           server: ${{ secrets.FTP_IP }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./build/
-          server-dir: ./results/
+          server-dir: ./testing_results/
