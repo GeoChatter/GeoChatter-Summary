@@ -1,7 +1,7 @@
 import adapter from '@sveltejs/adapter-static';
 
 import preprocess from "svelte-preprocess";
-
+const dev = process.env.NODE_ENV === 'development';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -16,7 +16,7 @@ const config = {
 	kit: {
 		prerender: { enabled: true, default: true },
 		paths: {
-			base: '/results'
+			base: dev ? "": process.env.BASE_PATH
 
 		},
 		adapter: adapter({
