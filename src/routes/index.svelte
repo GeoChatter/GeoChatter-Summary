@@ -58,7 +58,7 @@
 					class="flex items-end justify-center flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-2 xl:space-x-12"
 				>
 					<div class="w-full h-full text-white">
-						Summary of <span class="font-extrabold">{game.source.mapName}</span> hosted by <span class="font-extrabold">{game.players.find(player => player?.platformId === game.channel)?.displayName}</span>h
+						Summary of <span class="font-extrabold">{game.source.mapName}</span> hosted by <span class="font-extrabold">{game.players.find(player => player?.platformId === game.channel)?.displayName}</span>
 						<!-- for round amount -->
 						<!--  of ${game.rounds.length} rounds -->
 						<div class="relative w-full h-96 text-white">
