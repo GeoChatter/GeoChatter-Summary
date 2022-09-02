@@ -8,6 +8,7 @@ export declare module Response {
 
     export interface Player {
         id: number;
+        platformId: string;
         channel: string;
         twitchId: string;
         playerName: string;
@@ -74,7 +75,7 @@ export declare module Response {
         isTemporary: boolean;
         score: number;
         streak: number;
-        pano?: string ;
+        pano?: string;
         player: Player;
         timeStamp: Date;
         country: Country;
@@ -111,7 +112,7 @@ export declare module Response {
         id?: number;
         lat?: number;
         lng?: number;
-        panoId?: string ;
+        panoId?: string;
         heading?: number;
         pitch?: number;
         text?: string;
