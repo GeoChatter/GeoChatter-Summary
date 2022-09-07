@@ -55,7 +55,6 @@
 			>
 				loading
 			</div>
-			>
 		{:then game}
 			<div class="flex flex-col  h-full space-y-2 xl:space-y-12 pt-2 xl:pt-12 ">
 				<div
