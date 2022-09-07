@@ -8,8 +8,11 @@
 	const sortTime = (row1: Response.Result, row2: Response.Result) => row1.time - row2.time;
 	const sortDistance = (row1: Response.Result, row2: Response.Result) =>
 		row1.distance - row2.distance;
-
-	let currSort = sortScore;
+	const sortNumberOfGuessDividedByNoGuesses = (row1: Response.Result, row2: Response.Result) =>
+		row2?.player?.correctCountries / row2?.player?.noOfGuesses -
+		row1?.player?.correctCountries / row1?.player?.noOfGuesses;
+	const sortStreak = (row1: Response.Result, row2: Response.Result) =>
+		(row2?.player?.bestStreak ?? 0) - (row1?.player?.bestStreak ?? 0);
 
 	const getLastGame = (game: Response.Game) => {
 		let lastGame = game;
@@ -19,6 +22,13 @@
 		return lastGame;
 	};
 	game = getLastGame(game);
+	let currSort: (row1: Response.Result, row2: Response.Result) => void;
+
+	if (game.mode === 1) {
+		currSort = sortNumberOfGuessDividedByNoGuesses;
+	} else {
+		currSort = sortScore;
+	}
 </script>
 
 <table class="table w-full h-full">
@@ -27,8 +37,14 @@
 			<th />
 			<th>Name</th>
 			<th class="cursor-pointer" on:click={() => (currSort = sortDistance)}>Distance</th>
-			<th class="cursor-pointer" on:click={() => (currSort = sortScore)}>Score</th>
+			{#if game.mode !== 1}
+				<th class="cursor-pointer" on:click={() => (currSort = sortScore)}>Score</th>
+			{/if}
 			<th class="cursor-pointer" on:click={() => (currSort = sortTime)}>Time</th>
+			<th class="cursor-pointer" on:click={() => (currSort = sortStreak)}>Best Streak</th>
+			<th class="cursor-pointer" on:click={() => (currSort = sortNumberOfGuessDividedByNoGuesses)}
+				>Correct Countries / Total Guesses</th
+			>
 		</tr>
 	</thead>
 	{#each game.results.filter((row) => typeof row.player !== 'undefined').sort(currSort) as row, i}
@@ -62,9 +78,13 @@
 					</a>
 				</th>
 				<th>{Math.round(row.distance)} km</th>
-				<th>{row.score} </th><th
-					>{Math.round(row.time / 1000 / 60)} min {Math.round((row.time / 1000) % 60)} s</th
-				>
+
+				<!-- not showing score in streaks game  -->
+				{#if game.mode !== 1}
+					<th>{row.score} </th>
+				{/if}<th>{Math.round(row.time / 1000 / 60)} min {Math.round((row.time / 1000) % 60)} s</th>
+				<th>{row?.player?.bestStreak ?? 0} </th>
+				<th> {row?.player?.correctCountries ?? 0}/{row?.player?.noOfGuesses ?? 0}</th>
 			</tr>
 		</tbody>
 	{/each}
