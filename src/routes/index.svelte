@@ -18,7 +18,7 @@
 		if (id) {
 			if (dev) {
 				gameRes = fakeStreakGame();
-				console.log(gameRes);
+				// console.log(gameRes);
 			} else {
 				const connection = new signalR.HubConnectionBuilder()
 					.withUrl(import.meta.env.VITE_GEOCHATTERURL as string)
