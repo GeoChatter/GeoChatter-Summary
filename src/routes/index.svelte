@@ -11,14 +11,14 @@
 
 	let gameRes: Promise<Response.Game> | undefined;
 	import { page } from '$app/stores';
-	import fakeInfiniteGame from '$lib/js/fakeInfiniteGame';
-	// import fakeInfiniteGame from '$lib/js/fakeInfiniteGame';
+	import fakeStreakGame from '$lib/js/fakeStreakGame';
+	// import fakeStreakGame from '$lib/js/fakeStreakGame';
 	if (browser) {
 		const id = $page.url.searchParams.get('id');
 		if (id) {
 			if (dev) {
-				gameRes = fakeInfiniteGame();
-				console.log(gameRes)
+				gameRes = fakeStreakGame();
+				console.log(gameRes);
 			} else {
 				const connection = new signalR.HubConnectionBuilder()
 					.withUrl(import.meta.env.VITE_GEOCHATTERURL as string)
@@ -28,6 +28,22 @@
 					await startRes;
 					const res: Response.Game = await connection.invoke('GetSummary', gameId);
 
+					res.rounds.forEach((round) => {
+						round.guesses.map((guess) => {
+							guess.player;
+							if (guess.player.profilePictureUrl.startsWith('pin')) {
+								guess.player.profilePictureUrl = `https://www.geoguessr.com/images/auto/30/30/ce/0/plain/${guess.player.profilePictureUrl}`;
+							}
+							return guess;
+						});
+					});
+
+					res.results.map((result) => {
+							if (result.player.profilePictureUrl.startsWith('pin')) {
+								result.player.profilePictureUrl = `https://www.geoguessr.com/images/auto/48/48/ce/0/plain/${result.player.profilePictureUrl}`;
+							}
+							return result;
+					});
 					console.log(res);
 					return res;
 				};

@@ -1,5 +1,6 @@
 
 import type { Response } from '../../types/Game';
+import fakeInfiniteGame from './fakeInfiniteGame';
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -6021,5 +6022,22 @@ let fakeValue = {
     "player": null
   }
 }
+					fakeValue.rounds.forEach((round) => {
+						round.guesses.map((guess) => {
+							guess.player;
+							if (guess.player.profilePictureUrl.startsWith('pin')) {
+								guess.player.profilePictureUrl = `https://www.geoguessr.com/images/auto/30/30/ce/0/plain/${guess.player.profilePictureUrl}`;
+							}
+							return guess;
+						});
+					});
+										fakeValue.results.map((result) => {
+							if (result.player.profilePictureUrl.startsWith('pin')) {
+								result.player.profilePictureUrl = `https://www.geoguessr.com/images/auto/48/48/ce/0/plain/${result.player.profilePictureUrl}`;
+							}
+							return result;
+					});
+
+
     console.log(fakeValue)
     return fakeValue }
