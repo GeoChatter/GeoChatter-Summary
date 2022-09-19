@@ -40,14 +40,14 @@
 									{ color: guess?.player?.color ?? 'blue', smoothFactor: 1, opacity: 0.5 }
 								).addTo(map)
 							);
+							// L.divIcon({className: 'my-div-icon'})
 
-							let avatar = L.icon({
+							let avatar = L.divIcon({
 								// FIXME: Add url for not found
-								iconUrl: guess?.player?.profilePictureUrl ?? 'no pfp',
+								// iconUrl: guess?.player?.profilePictureUrl ?? 'no pfp',
 								iconSize: [30, 30],
-								className: `rounded-full border-4  ${
-									guess?.player?.color ? `border-[${guess?.player?.color}]` : 'border-blue-500'
-								}`
+								className: ``,
+								html: `<img style="border-color: ${guess?.player?.color? guess.player.color :"blue"}" class="rounded-full border-4 w-[30px] h-[30px]" src="${guess.player.profilePictureUrl}"/>`
 							});
 							markers[i].push(
 								L.marker([guess.guessLocation.latitude, guess.guessLocation.longitude], {
