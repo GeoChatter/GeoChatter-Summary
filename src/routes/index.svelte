@@ -9,47 +9,72 @@
 
 	let pano: Response.RoundLocation;
 
-	let gameRes: Promise<Response.Game> | undefined;
 	import { page } from '$app/stores';
+	import fakeInfiniteGame from '$lib/js/fakeInfiniteGame';
+	import type { setResponse } from '@sveltejs/kit/node';
 	import fakeStreakGame from '$lib/js/fakeStreakGame';
-	// import fakeStreakGame from '$lib/js/fakeStreakGame';
+
+	let streamerName: string | undefined;
+
+	function fixGGPicture(game: Response.Game) {
+		game.rounds.forEach((round) => {
+			round.guesses.map((guess) => {
+				guess.player;
+				if (guess.player.profilePictureUrl.startsWith('pin')) {
+					guess.player.profilePictureUrl = `https://www.geoguessr.com/images/auto/30/30/ce/0/plain/${guess.player.profilePictureUrl}`;
+				}
+				return guess;
+			});
+		});
+
+		game.results.map((result) => {
+			if (result.player.profilePictureUrl.startsWith('pin')) {
+				result.player.profilePictureUrl = `https://www.geoguessr.com/images/auto/48/48/ce/0/plain/${result.player.profilePictureUrl}`;
+			}
+			return result;
+		});
+		return game;
+	}
+
+	const getGameSummary = async (id: string): Promise<Response.Game> => {
+		let gameRes: Response.Game;
+		if (dev) {
+			gameRes = await fakeInfiniteGame();
+			// console.log(gameRes);
+		} else {
+			const connection = new signalR.HubConnectionBuilder()
+				.withUrl(import.meta.env.VITE_GEOCHATTERURL as string)
+				.build();
+			const startRes = connection.start();
+			await startRes;
+			gameRes = await connection.invoke('GetSummary', id);
+		}
+		if (!gameRes) {
+			throw 'no game found';
+		}
+
+		let game = gameRes;
+		if (!game.next) {
+			fixGGPicture(game);
+		} else {
+			let currentGame = game;
+			while (currentGame.next) {
+				fixGGPicture(currentGame);
+				currentGame = currentGame?.next;
+			}
+			streamerName =currentGame.players.find((player) => player?.platformId === game.channel)?.displayName;
+			fixGGPicture(currentGame);
+			currentGame = currentGame?.next;
+		}
+
+		console.log(game);
+		return game;
+	};
+
+	let gameRes: Promise<Response.Game> | undefined;
 	if (browser) {
 		const id = $page.url.searchParams.get('id');
-		if (id) {
-			if (dev) {
-				gameRes = fakeStreakGame();
-				// console.log(gameRes);
-			} else {
-				const connection = new signalR.HubConnectionBuilder()
-					.withUrl(import.meta.env.VITE_GEOCHATTERURL as string)
-					.build();
-				const startRes = connection.start();
-				const getGameSummary = async (gameId: string) => {
-					await startRes;
-					const res: Response.Game = await connection.invoke('GetSummary', gameId);
-
-					res.rounds.forEach((round) => {
-						round.guesses.map((guess) => {
-							guess.player;
-							if (guess.player.profilePictureUrl.startsWith('pin')) {
-								guess.player.profilePictureUrl = `https://www.geoguessr.com/images/auto/30/30/ce/0/plain/${guess.player.profilePictureUrl}`;
-							}
-							return guess;
-						});
-					});
-
-					res.results.map((result) => {
-							if (result.player.profilePictureUrl.startsWith('pin')) {
-								result.player.profilePictureUrl = `https://www.geoguessr.com/images/auto/48/48/ce/0/plain/${result.player.profilePictureUrl}`;
-							}
-							return result;
-					});
-					console.log(res);
-					return res;
-				};
-				gameRes = getGameSummary(id);
-			}
-		}
+		gameRes = getGameSummary(id as string);
 	}
 
 	//
@@ -79,8 +104,7 @@
 					<div class="w-full h-full text-white">
 						Summary of <span class="font-extrabold">{game.source.mapName}</span> hosted by
 						<span class="font-extrabold"
-							>{game.players.find((player) => player?.platformId === game.channel)
-								?.displayName}</span
+							>{streamerName}</span
 						>
 						<!-- for round amount -->
 						<!--  of ${game.rounds.length} rounds -->
