@@ -9,6 +9,7 @@ export declare module Response {
     export interface Player {
         id: number;
         platformId: string;
+        sourcePlatform: number,
         channel: string;
         twitchId: string;
         playerName: string;
