@@ -19,7 +19,7 @@
 				});
 				L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 					attribution:
-						'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+						'&copy; <a target="_blank" href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 				}).addTo(map);
 
 				const renderGame = (game: Response.Game, roundsBefore = 1) => {
@@ -47,7 +47,11 @@
 								// iconUrl: guess?.player?.profilePictureUrl ?? 'no pfp',
 								iconSize: [30, 30],
 								className: ``,
-								html: `<img style="border-color: ${guess?.player?.color? guess.player.color :"blue"}" class="rounded-full border-4 w-[30px] h-[30px]" src="${guess.player.profilePictureUrl}"/>`
+								html: `<img style="border-color: ${
+									guess?.player?.color ? guess.player.color : 'blue'
+								}" class="rounded-full border-4 w-[30px] h-[30px]" src="${
+									guess.player.profilePictureUrl
+								}"/>`
 							});
 							markers[i].push(
 								L.marker([guess.guessLocation.latitude, guess.guessLocation.longitude], {
@@ -132,8 +136,8 @@
 <svelte:head>
 	<link
 		rel="stylesheet"
-		href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
-		integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
+		href="https://unpkg.com/leaflet@1.9.1/dist/leaflet.css"
+		integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14="
 		crossorigin=""
 	/>
 </svelte:head>
@@ -157,9 +161,11 @@
 	{/each}
 	<button
 		on:click={() => {
-			Object.values(markers).forEach((markerArray) =>  markerArray.forEach(marker => marker.addTo(map)));
+			Object.values(markers).forEach((markerArray) =>
+				markerArray.forEach((marker) => marker.addTo(map))
+			);
 			currentSelectedIndex = undefined;
-			callback()
+			callback();
 		}}
 		class="btn btn-xs">reset</button
 	>

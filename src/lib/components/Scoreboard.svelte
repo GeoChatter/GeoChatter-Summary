@@ -2,6 +2,7 @@
 	import type { Response } from '../../types/Game';
 	import { getPlayerNameFromPlayer } from '../js/helpers';
 	export let game: Response.Game;
+	export let correctAndWrong: any;
 
 	// different ways to sort it
 	const sortScore = (row1: Response.Result, row2: Response.Result) => row2.score - row1.score;
@@ -28,7 +29,23 @@
 		currSort = sortNumberOfGuessDividedByNoGuesses;
 	} else {
 		currSort = sortScore;
+
 	}
+
+	function generateLink(player: Response.Player): string {
+			if (player.sourcePlatform === 3 ){
+				return "https://www.geoguessr.com/user/" + player.platformId
+			}
+			if (player.sourcePlatform === 1 ){
+				return 'https://twitch.tv/' + player?.displayName ?? player?.playerName
+			}
+
+			if (player.sourcePlatform === 2 ){
+				return "http://www.youtube.com/results?search_query=" + player.displayName
+			}
+			throw "unknown sourcePlatform"
+		}
+
 </script>
 
 <table class="table w-full h-full">
@@ -41,7 +58,7 @@
 				<th class="cursor-pointer" on:click={() => (currSort = sortScore)}>Score</th>
 			{/if}
 			<th class="cursor-pointer" on:click={() => (currSort = sortTime)}>Time</th>
-			<th class="cursor-pointer" on:click={() => (currSort = sortStreak)}>Best Streak</th>
+			<!-- <th class="cursor-pointer" on:click={() => (currSort = sortStreak)}>Best Streak</th> -->
 			<th class="cursor-pointer" on:click={() => (currSort = sortNumberOfGuessDividedByNoGuesses)}
 				>Correct Countries / Total Guesses</th
 			>
@@ -52,8 +69,9 @@
 			<tr>
 				<th>{i + 1}</th>
 				<th>
+
 					<a
-						href={'https://twitch.tv/' + row.player?.displayName ?? row.player?.playerName}
+						href={generateLink(row.player)}
 						target="_blank"
 					>
 						<div class="flex items-center space-x-2">
@@ -83,8 +101,8 @@
 				{#if game.mode !== 1}
 					<th>{row.score} </th>
 				{/if}<th>{Math.round(row.time / 1000 / 60)} min {Math.round((row.time / 1000) % 60)} s</th>
-				<th>{row?.player?.bestStreak ?? 0} </th>
-				<th> {row?.player?.correctCountries ?? 0}/{row?.player?.noOfGuesses ?? 0}</th>
+				<!-- <th>{row?.player?.bestStreak ?? 0} </th> -->
+				<th> {correctAndWrong[row?.player?.platformId].right}/{correctAndWrong[row?.player?.platformId].total}</th>
 			</tr>
 		</tbody>
 	{/each}

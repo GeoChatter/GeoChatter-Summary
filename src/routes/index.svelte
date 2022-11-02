@@ -14,8 +14,6 @@
 	import type { setResponse } from '@sveltejs/kit/node';
 	import fakeStreakGame from '$lib/js/fakeStreakGame';
 
-	let streamerName: string | undefined;
-
 	function fixGGPicture(game: Response.Game) {
 		game.rounds.forEach((round) => {
 			round.guesses.map((guess) => {
@@ -36,10 +34,38 @@
 		return game;
 	}
 
+	function getStreamer(game: Response.Game) {
+		for (let result of game.results) {
+			if (result.player.sourcePlatform === 3) {
+				return result.player.displayName;
+			}
+		}
+		return 'streamer not found';
+	}
+
+	let correctAndWrong: any = {};
+
+	function countCorrectAndWrong(game: Response.Game) {
+		for (let round of game.rounds) {
+			for (let guess of round.guesses) {
+				if (!Object.keys(correctAndWrong).includes(guess.player.platformId)) {
+					correctAndWrong[guess.player.platformId] = { right: 0, total: 0 };
+				}
+				console.log(guess, round)
+				if (guess.player.countryStreak > 0 ) {
+					correctAndWrong[guess.player.platformId].right = correctAndWrong[
+						guess.player.platformId
+					].right + 1;
+				}
+				correctAndWrong[guess.player.platformId].total =
+					1 + correctAndWrong[guess.player.platformId].total;
+			}
+		}
+	}
 	const getGameSummary = async (id: string): Promise<Response.Game> => {
 		let gameRes: Response.Game;
 		if (dev) {
-			gameRes = await fakeInfiniteGame();
+			gameRes = await fakeStreakGame();
 			// console.log(gameRes);
 		} else {
 			const connection = new signalR.HubConnectionBuilder()
@@ -56,17 +82,20 @@
 		let game = gameRes;
 		if (!game.next) {
 			fixGGPicture(game);
+			countCorrectAndWrong(game);
 		} else {
 			let currentGame = game;
 			while (currentGame.next) {
 				fixGGPicture(currentGame);
+				countCorrectAndWrong(game);
 				currentGame = currentGame?.next;
 			}
-			streamerName =currentGame.players.find((player) => player?.platformId === game.channel)?.displayName;
 			fixGGPicture(currentGame);
+			countCorrectAndWrong(game);
 			currentGame = currentGame?.next;
 		}
 
+		console.log('correct and wrong', correctAndWrong);
 		console.log(game);
 		return game;
 	};
@@ -76,8 +105,6 @@
 		const id = $page.url.searchParams.get('id');
 		gameRes = getGameSummary(id as string);
 	}
-
-	//
 </script>
 
 <div class="xl:p-12">
@@ -103,9 +130,7 @@
 				>
 					<div class="w-full h-full text-white">
 						Summary of <span class="font-extrabold">{game.source.mapName}</span> hosted by
-						<span class="font-extrabold"
-							>{streamerName}</span
-						>
+						<span class="font-extrabold">{getStreamer(game)}</span>
 						<!-- for round amount -->
 						<!--  of ${game.rounds.length} rounds -->
 						<div class="relative w-full h-96 text-white">
@@ -127,7 +152,7 @@
 					{/if}
 				</div>
 				<div>
-					<Scoreboard {game} />
+					<Scoreboard {game}  {correctAndWrong}/>
 				</div>
 			</div>
 		{:catch error}
